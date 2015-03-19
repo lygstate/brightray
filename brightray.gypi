@@ -86,6 +86,24 @@
               'oleacc.lib',
               'user32.lib',
             ],
+            'conditions': [
+              ['target_arch=="ia32"', {
+                'TargetMachine' : 1, # /MACHINE:X86
+                'target_conditions': [
+                  ['_type=="executable"', {
+                    'AdditionalOptions': [ '/SubSystem:WINDOWS,"5.01"' ],
+                  }],
+                ],
+              }],
+              ['target_arch=="x64"', {
+                'TargetMachine' : 17, # /MACHINE:AMD64
+                'target_conditions': [
+                  ['_type=="executable"', {
+                    'AdditionalOptions': [ '/SubSystem:WINDOWS,"5.02"' ],
+                  }],
+                ],
+              }],
+            ]
           },
         },
         'conditions': [
@@ -145,14 +163,6 @@
               }],
             ],
           },
-          'VCLinkerTool': {
-            'TargetMachine' : 1, # /MACHINE:X86
-            'target_conditions': [
-              ['_type=="executable"', {
-                'AdditionalOptions': [ '/SubSystem:WINDOWS,"5.01"' ],
-              }],
-            ],
-          },
         },
         'xcode_settings': {
           'COPY_PHASE_STRIP': 'NO',
@@ -197,14 +207,6 @@
               }],
             ],
           },
-          'VCLinkerTool': {
-            'TargetMachine' : 1, # /MACHINE:X86
-            'target_conditions': [
-              ['_type=="executable"', {
-                'AdditionalOptions': [ '/SubSystem:WINDOWS,"5.01"' ],
-              }],
-            ],
-          },
         },
       },
       'Debug_x64': {
@@ -215,52 +217,6 @@
           '_WIN32_WINNT=0x0502',
           'WINVER=0x0502',
         ],
-        'msvs_settings': {
-          'VCCLCompilerTool': {
-            'Optimization': '<(win_debug_Optimization)',
-            'BasicRuntimeChecks': '<(win_debug_RuntimeChecks)',
-            # We use Release to match the version of chromiumcontent.dll we
-            # link against.
-            'RuntimeLibrary': '<(win_release_RuntimeLibrary)',
-            'conditions': [
-              # According to MSVS, InlineFunctionExpansion=0 means
-              # "default inlining", not "/Ob0".
-              # Thus, we have to handle InlineFunctionExpansion==0 separately.
-              ['win_debug_InlineFunctionExpansion==0', {
-                'AdditionalOptions': ['/Ob0'],
-              }],
-              ['win_debug_InlineFunctionExpansion!=""', {
-                'InlineFunctionExpansion':
-                  '<(win_debug_InlineFunctionExpansion)',
-              }],
-              # if win_debug_OmitFramePointers is blank, leave as default
-              ['win_debug_OmitFramePointers==1', {
-                'OmitFramePointers': 'true',
-              }],
-              ['win_debug_OmitFramePointers==0', {
-                'OmitFramePointers': 'false',
-                # The above is not sufficient (http://crbug.com/106711): it
-                # simply eliminates an explicit "/Oy", but both /O2 and /Ox
-                # perform FPO regardless, so we must explicitly disable.
-                # We still want the false setting above to avoid having
-                # "/Oy /Oy-" and warnings about overriding.
-                'AdditionalOptions': ['/Oy-'],
-              }],
-            ],
-          },
-          'VCLinkerTool': {
-            'TargetMachine' : 17, # /MACHINE:AMD64
-            'target_conditions': [
-              ['_type=="executable"', {
-                'AdditionalOptions': [ '/SubSystem:WINDOWS,"5.02"' ],
-              }],
-            ],
-          },
-        },
-        'xcode_settings': {
-          'COPY_PHASE_STRIP': 'NO',
-          'GCC_OPTIMIZATION_LEVEL': '0',
-        },
       },
       'Release_x64': {
         'inherit_from': [
@@ -270,45 +226,6 @@
           '_WIN32_WINNT=0x0502',
           'WINVER=0x0502',
         ],
-        'msvs_settings': {
-          'VCCLCompilerTool': {
-            'Optimization': '<(win_release_Optimization)',
-            'RuntimeLibrary': '<(win_release_RuntimeLibrary)',
-            'conditions': [
-              # According to MSVS, InlineFunctionExpansion=0 means
-              # "default inlining", not "/Ob0".
-              # Thus, we have to handle InlineFunctionExpansion==0 separately.
-              ['win_release_InlineFunctionExpansion==0', {
-                'AdditionalOptions': ['/Ob0'],
-              }],
-              ['win_release_InlineFunctionExpansion!=""', {
-                'InlineFunctionExpansion':
-                  '<(win_release_InlineFunctionExpansion)',
-              }],
-              # if win_release_OmitFramePointers is blank, leave as default
-              ['win_release_OmitFramePointers==1', {
-                'OmitFramePointers': 'true',
-              }],
-              ['win_release_OmitFramePointers==0', {
-                'OmitFramePointers': 'false',
-                # The above is not sufficient (http://crbug.com/106711): it
-                # simply eliminates an explicit "/Oy", but both /O2 and /Ox
-                # perform FPO regardless, so we must explicitly disable.
-                # We still want the false setting above to avoid having
-                # "/Oy /Oy-" and warnings about overriding.
-                'AdditionalOptions': ['/Oy-'],
-              }],
-            ],
-          },
-          'VCLinkerTool': {
-            'TargetMachine' : 17, # /MACHINE:AMD64
-            'target_conditions': [
-              ['_type=="executable"', {
-                'AdditionalOptions': [ '/SubSystem:WINDOWS,"5.02"' ],
-              }],
-            ],
-          },
-        },
       },
     },
     'conditions': [
